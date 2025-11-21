@@ -1,4 +1,5 @@
-version: "3.9" #Declaramos la version de la especificacion del archivo compose
+#version: "3.9" #Es un argumneto obsoleto.
+#              #Declaramos la version de la especificacion del archivo compose
                #en las versiones actualizadas de docker no es necesario, ya que 
                #lo detecta automaticamente.
 
@@ -15,7 +16,7 @@ services:
       DB_HOST: db
       DB_USER: mopii
       DB_PASSWORD: daw
-      DB_NAME: mydatabase
+      DB_NAME: tienda_forestal
     depends_on:
       - db
 
@@ -37,8 +38,8 @@ services:
     environment:
       MYSQL_ROOT_PASSWORD: iesmariamoliner
       MYSQL_DATABASE: tienda_forestal
-  #   MYSQL_USER: mopii
-  #   MYSQL_PASSWORD: daw
+      MYSQL_USER: mopii
+      MYSQL_PASSWORD: daw
     ports:
       - "3306:3306"
     volumes:
@@ -55,8 +56,10 @@ services:
                       # login:
     environment:
       PMA_HOST: db        # phpMyAdmin debe mirar al contenedor "db" creado con anterioridad
-      PMA_USER: root
-      PMA_PASSWORD: iesmariamoliner
+  #   PMA_USER: root
+  #   PMA_PASSWORD: iesmariamoliner
+      PMA_USER: mopii
+      PMA_PASSWORD: daw
     depends_on:
       - db
 

@@ -11,4 +11,5 @@ class Config:
     MYSQL_PASSWORD = os.getenv('MYSQL_PASSWORD', 'daw')
     MYSQL_DB = os.getenv('MYSQL_DB', 'tienda_forestal')
     MYSQL_CHARSET = 'utf8mb4'
+    MYSQL_CURSOCLASS = 'DictCursor'
 

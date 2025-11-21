@@ -1,6 +1,15 @@
 # Imagen base con Python
 FROM python:3.11-slim
 
+# Instalar dependencias necesarias del sistema
+RUN apt-get update && apt-get install -y \
+    build-essential \
+    pkg-config \
+    default-libmysqlclient-dev \
+    gcc \
+    && apt-get clean \
+    && rm -rf /var/lib/apt/lists/*
+
 # Establecemos el directorio de trabajo
 WORKDIR /app
 
@@ -11,7 +20,8 @@ COPY requirements.txt .
 RUN pip install --no-cache-dir -r requirements.txt
 
 # Copiamos el código fuente de la aplicación
-COPY app/ ./app
+#COPY app/ ./app
+COPY . .
 
 # Exponemos el puerto 5000 para Flask
 EXPOSE 5000

@@ -7,6 +7,7 @@ Vamos a estructurar la aplicación a traves de tres servicios principales:
  - #Backend     Flask (Python)      API REST que consulta MySQL y expone endpoints JSON
  - #Frontend    Vue.js (Node)       Interfaz de usuario SPA (Single Page Application)
  - #DataBase    MySQL               Base de datos relacional con tus productos
+ - #            phpMyAdmin
 
 *Estructura de directorios*
 
@@ -30,6 +31,7 @@ tienda_forestal_mvc_vue/
 │   ├── Dockerfile
 │   ├── package.json
 │   ├── vite.config.js
+│   ├── index.html
 │   └── src/
 │       ├── main.js
 │       ├── App.vue
@@ -188,6 +190,7 @@ docker-compose up --build
  - #Para abrir el frontend (*Vue.js*) -> http://localhost:8080
  - #Para abrir el backend (*Flask API*) -> http://localhost:5000/api/productos
  - #Para abrir la base de datos de MySQL: puerto 3306
+ - #Para abrir el gestor de base de datos phpMyAdmin: http://localhost:8081
 
 **##OTROS**
 
