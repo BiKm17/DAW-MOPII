@@ -19,6 +19,12 @@ services:
       DB_NAME: tienda_forestal
     depends_on:
       - db
+ # Espera a que MySQL esté listo
+ #   healthcheck:
+ #     test: ["CMD", "python", "-c", "import mysql.connector; mysql.connector.connect(host='db', user='mopii', password='daw', database='tienda_forestal')"]
+ #     interval: 10s
+ #     timeout: 30s
+ #     retries: 5
 
   #Desplegamos los servicios del frontend
   frontend:
@@ -45,6 +51,7 @@ services:
     volumes:
       # Persistencia de datos
       - mysql_data:/var/lib/mysql
+      - ./db/init.sql:/docker-entrypoint-initdb.d/init.sql:ro
 
   #Incluimos el servicio phpMyAdmin
   phpmyadmin:

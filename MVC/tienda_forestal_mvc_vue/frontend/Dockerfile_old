@@ -1,0 +1,17 @@
+# Etapa 1: construcción
+FROM node:20-alpine as build
+
+WORKDIR /app
+COPY package*.json ./
+RUN npm install
+COPY . .
+RUN npm run build
+
+# Etapa 2: servidor de desarrollo
+FROM node:20-alpine
+WORKDIR /app
+COPY --from=build /app/dist ./dist
+RUN npm install -g serve
+EXPOSE 8080
+CMD ["serve", "-s", "dist", "8080"]
+
