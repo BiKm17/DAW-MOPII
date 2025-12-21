@@ -6,6 +6,6 @@
 </template>
 
 <script setup>
-import ProductosView from "./components/ProductosView.vue";
+import ProductosView from "@/components/ProductosView.vue";
 </script>
 

@@ -1,86 +1,176 @@
-#Modelo puro - sin Flask ni HTTP
-import mysql.connector
-import os
+"""
+producto_model.py
+=================
+Capa MODELO del patrón MVP.
 
-# ----------------------------------------
-# CONEXIÓN A BD USANDO VARIABLES DE ENTORNO
-# ----------------------------------------
+Responsabilidad:
+- Conectarse a la base de datos MySQL
+- Ejecutar consultas SQL
+- Devolver datos en estructuras Python (listas/dict)
+
+❌ No sabe nada de Flask
+❌ No sabe nada de Vue
+❌ No sabe nada de Presenters
+"""
+
+import os
+import mysql.connector
+
+
 def obtener_conexion():
     """
-    Crea una conexión a MySQL leyendo
-    las credenciales desde Docker.
+    Crea y devuelve una conexión a MySQL usando
+    variables de entorno (definidas en docker-compose.yml)
     """
     return mysql.connector.connect(
-        host=os.environ.get("DB_HOST"),
-        user=os.environ.get("DB_USER"),
-        password=os.environ.get("DB_PASSWORD"),
-        database=os.environ.get("DB_NAME")
+        host=os.getenv("DB_HOST"),
+        user=os.getenv("DB_USER"),
+        password=os.getenv("DB_PASSWORD"),
+        database=os.getenv("DB_NAME"),
     )
 
-# -------------------------
-# OBTENER TODOS LOS PRODUCTOS
-# -------------------------
-def obtener_productos():
-    conn = obtener_conexion()
-    cursor = conn.cursor(dictionary=True)
 
-    cursor.execute("SELECT * FROM productos")
-    productos = cursor.fetchall()
+def obtener_productos_filtrados(
+    termino=None,
+    tipo=None,
+    marca=None,
+    precio_min=None,
+    precio_max=None,
+    pagina=1,
+    por_pagina=10,
+    ordenar=None
+):
+    """
+    Devuelve productos aplicando filtros, búsqueda y paginación.
+    """
 
-    conn.close()
-    return productos
+    conexion = obtener_conexion()
+    cursor = conexion.cursor(dictionary=True)
 
-# -------------------------
-# BÚSQUEDA POR TEXTO
-# -------------------------
-def buscar_productos(termino):
-    conn = obtener_conexion()
-    cursor = conn.cursor(dictionary=True)
+    condiciones = []
+    parametros = []
 
-    cursor.execute(
-        """
-        SELECT * FROM productos
-        WHERE nombre LIKE %s OR marca LIKE %s
-        """,
-        (f"%{termino}%", f"%{termino}%")
-    )
+    # -------------------------
+    # BÚSQUEDA GENERAL
+    # -------------------------
+    if termino:
+        condiciones.append(
+            "(nombre LIKE %s OR descripcion LIKE %s OR marca LIKE %s)"
+        )
+        like = f"%{termino}%"
+        parametros.extend([like, like, like])
 
-    productos = cursor.fetchall()
-    conn.close()
-    return productos
+    # -------------------------
+    # FILTROS ESPECÍFICOS
+    # -------------------------
+    if tipo:
+        condiciones.append("tipo = %s")
+        parametros.append(tipo)
 
-# -------------------------
-# FILTRADO BÁSICO CON PAGINACIÓN
-# -------------------------
-def filtrar_productos(pagina, por_pagina, ordenar):
+    if marca:
+        condiciones.append("marca = %s")
+        parametros.append(marca)
+
+    if precio_min is not None:
+        condiciones.append("precio >= %s")
+        parametros.append(precio_min)
+
+    if precio_max is not None:
+        condiciones.append("precio <= %s")
+        parametros.append(precio_max)
+
+    where_clause = ""
+    if condiciones:
+        where_clause = "WHERE " + " AND ".join(condiciones)
+
+    # -------------------------
+    # ORDENACIÓN
+    # -------------------------
+    order_clause = ""
+    if ordenar == "asc":
+        order_clause = "ORDER BY precio ASC"
+    elif ordenar == "desc":
+        order_clause = "ORDER BY precio DESC"
+
+    # -------------------------
+    # PAGINACIÓN
+    # -------------------------
     offset = (pagina - 1) * por_pagina
 
-    orden_sql = ""
-    if ordenar == "asc":
-        orden_sql = "ORDER BY precio ASC"
-    elif ordenar == "desc":
-        orden_sql = "ORDER BY precio DESC"
-
-    conn = obtener_conexion()
-    cursor = conn.cursor(dictionary=True)
-
     query = f"""
-        SELECT * FROM productos
-        {orden_sql}
+        SELECT *
+        FROM productos
+        {where_clause}
+        {order_clause}
         LIMIT %s OFFSET %s
     """
 
-    cursor.execute(query, (por_pagina, offset))
+    parametros.extend([por_pagina, offset])
+
+    cursor.execute(query, parametros)
     productos = cursor.fetchall()
 
-    cursor.execute("SELECT COUNT(*) AS total FROM productos")
-    total = cursor.fetchone()["total"]
+    cursor.close()
+    conexion.close()
 
-    conn.close()
+    return productos
 
-    return {
-        "productos": productos,
-        "pagina_actual": pagina,
-        "total_paginas": (total + por_pagina - 1) // por_pagina,
-        "total_resultados": total
-    }
+
+def contar_productos_filtrados(
+    termino=None,
+    tipo=None,
+    marca=None,
+    precio_min=None,
+    precio_max=None
+):
+    """
+    Devuelve el total de productos que cumplen los filtros.
+    Necesario para calcular paginación.
+    """
+
+    conexion = obtener_conexion()
+    cursor = conexion.cursor()
+
+    condiciones = []
+    parametros = []
+
+    if termino:
+        condiciones.append(
+            "(nombre LIKE %s OR descripcion LIKE %s OR marca LIKE %s)"
+        )
+        like = f"%{termino}%"
+        parametros.extend([like, like, like])
+
+    if tipo:
+        condiciones.append("tipo = %s")
+        parametros.append(tipo)
+
+    if marca:
+        condiciones.append("marca = %s")
+        parametros.append(marca)
+
+    if precio_min is not None:
+        condiciones.append("precio >= %s")
+        parametros.append(precio_min)
+
+    if precio_max is not None:
+        condiciones.append("precio <= %s")
+        parametros.append(precio_max)
+
+    where_clause = ""
+    if condiciones:
+        where_clause = "WHERE " + " AND ".join(condiciones)
+
+    query = f"""
+        SELECT COUNT(*) 
+        FROM productos
+        {where_clause}
+    """
+
+    cursor.execute(query, parametros)
+    total = cursor.fetchone()[0]
+
+    cursor.close()
+    conexion.close()
+
+    return total

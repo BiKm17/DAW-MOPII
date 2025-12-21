@@ -1,59 +1,94 @@
-#Presenter del backend - Importantisimo para MVP
-from flask import Blueprint, request, jsonify
+"""
+producto_api.py
+===============
+Capa API del patrón MVP.
 
-# Importamos el modelo (lógica de datos)
+Responsabilidad:
+- Exponer endpoints REST
+- Validar parámetros
+- Llamar al modelo
+- Devolver JSON limpio al frontend
+
+❌ No contiene lógica de presentación
+
+Esta capa:
+
+recibe peticiones HTTP
+
+valida parámetros
+
+llama al modelo
+
+devuelve JSON
+
+❌ No renderiza HTML
+❌ No decide vistas
+"""
+
+from flask import Blueprint, request, jsonify
 from models.producto_model import (
-    obtener_productos,
-    buscar_productos,
-    filtrar_productos
+    obtener_productos_filtrados,
+    contar_productos_filtrados
 )
 
-# Blueprint = módulo independiente de rutas
-producto_api_blueprint = Blueprint("producto_api", __name__)
+producto_api = Blueprint("producto_api", __name__)
 
-# -------------------------
-# ENDPOINT: listar productos
-# -------------------------
-@producto_api_blueprint.route("/productos", methods=["GET"])
+
+@producto_api.route("/productos", methods=["GET"])
 def listar_productos():
     """
-    Devuelve todos los productos.
-    No contiene lógica de negocio.
-    Solo orquesta la llamada al modelo.
+    Endpoint principal para:
+    - listado
+    - filtros
+    - búsqueda
+    - paginación
     """
-    productos = obtener_productos()
-    return jsonify(productos)
 
-# -------------------------
-# ENDPOINT: búsqueda simple
-# -------------------------
-@producto_api_blueprint.route("/productos/buscar", methods=["GET"])
-def buscar():
-    """
-    Recibe un término por query string
-    y delega la búsqueda al modelo.
-    """
-    termino = request.args.get("termino", "")
-    productos = buscar_productos(termino)
-    return jsonify(productos)
+    # -------------------------
+    # LECTURA DE PARÁMETROS
+    # -------------------------
+    termino = request.args.get("termino")
+    tipo = request.args.get("tipo")
+    marca = request.args.get("marca")
 
-# -------------------------
-# ENDPOINT: filtrado básico
-# -------------------------
-@producto_api_blueprint.route("/productos/filtrar", methods=["GET"])
-def filtrar():
-    """
-    Ejemplo de endpoint preparado
-    para paginación y filtros.
-    """
-    pagina = int(request.args.get("pagina", 1))
-    por_pagina = int(request.args.get("por_pagina", 10))
-    ordenar = request.args.get("ordenar", "")
+    precio_min = request.args.get("precio_min", type=float)
+    precio_max = request.args.get("precio_max", type=float)
 
-    resultado = filtrar_productos(
+    pagina = request.args.get("pagina", default=1, type=int)
+    por_pagina = request.args.get("por_pagina", default=10, type=int)
+
+    ordenar = request.args.get("ordenar")
+
+    # -------------------------
+    # LLAMADA AL MODELO
+    # -------------------------
+    productos = obtener_productos_filtrados(
+        termino=termino,
+        tipo=tipo,
+        marca=marca,
+        precio_min=precio_min,
+        precio_max=precio_max,
         pagina=pagina,
         por_pagina=por_pagina,
         ordenar=ordenar
     )
 
-    return jsonify(resultado)
+    total = contar_productos_filtrados(
+        termino=termino,
+        tipo=tipo,
+        marca=marca,
+        precio_min=precio_min,
+        precio_max=precio_max
+    )
+
+    total_paginas = (total + por_pagina - 1) // por_pagina
+
+    # -------------------------
+    # RESPUESTA JSON
+    # -------------------------
+    return jsonify({
+        "productos": productos,
+        "pagina_actual": pagina,
+        "total_paginas": total_paginas,
+        "total_resultados": total
+    })

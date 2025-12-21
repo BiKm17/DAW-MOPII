@@ -1,11 +1,29 @@
-import axios from "axios";
+// src/services/api.js
+// ===================================================
+// Capa de acceso a la API (backend Flask)
+// En MVP: esta capa SOLO se encarga de pedir datos
+// ===================================================
 
-const api = axios.create({
-  baseURL: "/api"
-});
+import axios from 'axios'
 
-export const filtrarProductos = (params) =>
-  api.get("/productos/filtrar", { params });
+// Axios usará rutas relativas (proxy o nginx)
+const API_BASE = '/api/productos'
 
-export const buscarProductos = (termino) =>
-  api.get("/productos/buscar", { params: { termino } });
+/**
+ * Obtener todos los productos
+ */
+export async function getProductos() {
+  const response = await axios.get(API_BASE)
+  return response.data
+}
+
+/**
+ * Buscar productos por término
+ * @param {string} termino
+ */
+export async function buscarProductos(termino) {
+  const response = await axios.get(`${API_BASE}/buscar`, {
+    params: { termino }
+  })
+  return response.data
+}
