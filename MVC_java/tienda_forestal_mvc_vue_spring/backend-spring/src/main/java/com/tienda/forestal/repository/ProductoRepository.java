@@ -8,6 +8,6 @@ import org.springframework.data.jpa.repository.JpaRepository;
  * Repository de Producto
  * Spring genera automáticamente las consultas SQL
  */
-public interface ProductoRepository extends JpaRepository<Producto, Long> {
+public interface ProductoRepository extends JpaRepository<Producto, Integer> {
 }
 
