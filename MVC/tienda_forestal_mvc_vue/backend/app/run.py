@@ -1,7 +1,3 @@
-"""
-Punto de entrada principal del servidor Flask.
-Registra los Blueprints (controladores) y arranca la aplicación.
-"""
 
 from flask import Flask
 from flask_cors import CORS
@@ -19,8 +15,10 @@ app.register_blueprint(producto_blueprint, url_prefix="/api")
 
 @app.route("/")
 def home():
-    return "Backend Flask funcionando correctamente."
+    # Mensaje de bienvenida personalizado
+    return "¡Conexión establecida! El sistema de la Tienda Forestal está operativo."
 
 if __name__ == "__main__":
+    # Ejecución de la aplicación en el puerto 5000
     app.run(debug=True, host="0.0.0.0", port=5000)
 
