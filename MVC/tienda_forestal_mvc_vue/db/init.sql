@@ -41,4 +41,9 @@ INSERT INTO productos (nombre, tipo, marca, descripcion, precio, stock, imagen) 
 ('Maza Stanley FatMax FME-MFM18XB-1', 'maza', 'Stanley', 'Maza profesional para uso forestal con mango de fibra', 79.90, 20, 'maza_stanley_fatmax_fmemfm18xb1.jpg'),
 ('Casco Forestal Husqvarna Technical XR', 'accesorio', 'Husqvarna', 'Casco técnico con protección para tala intensiva', 99.90, 15, 'casco_husqvarna_technical_xr.jpg'),
 ('Kit Limpieza Motosierra Stihl Premium', 'accesorio', 'Stihl', 'Kit de limpieza y mantenimiento para motosierra', 39.00, 30, 'kit_limpieza_motosierra_stihl_premium.jpg');
-
+-- 5 NUEVOS REGISTROS AÑADIDOS
+('Cafetera Expresso DeLonghi', 'electrodoméstico', 'DeLonghi', 'Cafetera automática para oficina o casa', 159.00, 5, 'cafetera_delonghi.jpg'),
+('Monitor Gaming 27p LG', 'electrónica', 'LG', 'Monitor 4K ideal para diseño y gaming', 349.00, 10, 'monitor_lg_27.jpg'),
+('Silla Ergonómica Pro', 'mueble', 'Ofisilla', 'Silla de oficina con soporte lumbar', 199.50, 15, 'silla_pro.jpg'),
+('Teclado Mecánico RGB', 'periférico', 'Logitech', 'Teclado para programadores con switches brown', 89.90, 20, 'teclado_logitech.jpg'),
+('Auriculares Noise Cancelling', 'electrónica', 'Sony', 'Auriculares inalámbricos con cancelación de ruido', 279.00, 8, 'sony_wh1000.jpg');
