@@ -18,11 +18,11 @@
     <input
       type="text"
       v-model="terminoBusqueda"
-      placeholder="Buscar por nombre, tipo o marca"
-      @keyup.enter="accionBuscar"
+      placeholder="Introduzca el producto o encontrar..."
+      @keyup.enter="accionEncontrar"
       class="search-input"
     />
-    <button @click="accionBuscar">Buscar</button>
+    <button @click="accionEncontrar">Buscar</button>
 
     <!-- ===============================
          FILTROS AVANZADOS
@@ -55,7 +55,7 @@
         <img :src="'/img/' + p.imagen" :alt="p.nombre" />
         <h3>{{ p.nombre }}</h3>
         <p>{{ p.descripcion }}</p>
-        <strong>{{ p.precio }} €</strong><br>
+        <strong>{{ p.precio }} euros</strong><br>
         <small>Stock: {{ p.stock }}</small>
       </div>
     </div>
@@ -65,7 +65,7 @@
          =============================== -->
     <div class="paginacion" v-if="totalPaginas > 1">
       <button @click="cambiarPagina(paginaActual - 1)" :disabled="paginaActual === 1">
-        Anterior
+        <- Anterior
       </button>
 
       <button
@@ -78,7 +78,7 @@
       </button>
 
       <button @click="cambiarPagina(paginaActual + 1)" :disabled="paginaActual === totalPaginas">
-        Siguiente
+        Siguiente ->
       </button>
     </div>
 
@@ -173,7 +173,7 @@ const cargarProductos = async () => {
    - Llama a /api/productos/buscar?termino=...
    - Se ejecuta al pulsar ENTER o el botón Buscar
    ============================================================ */
-const accionBuscar = async () => {
+const accionEncontrar = async () => {
   paginaActual.value = 1
 
   // Si no hay texto, recargamos el catálogo normal
@@ -231,14 +231,14 @@ cargarProductos()
 .grid {
   display: grid;
   grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
-  gap: 1rem;
+  gap: 2.5rem;
 }
 
 .card {
-  background: white;
+  background: iceblue;
   padding: 1rem;
   border-radius: 10px;
-  box-shadow: 0 0 5px rgba(0,0,0,0.1);
+  box-shadow: 0 4px 15px rgba(0,0,0,0.2);
 }
 
 .card img {
@@ -260,8 +260,8 @@ cargarProductos()
 }
 
 button.activo {
-  background-color: #4CAF50;
-  color: white;
+  background-color: #1a73e8;
+  color: #ffffff;
   font-weight: bold;
 }
 </style>
